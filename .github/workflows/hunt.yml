@@ -58,3 +58,4 @@ jobs:
           path: apartment_hunter/apartments.db
           retention-days: 90
           if-no-files-found: ignore
+
