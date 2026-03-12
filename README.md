@@ -1,105 +1,130 @@
 🏠 Apartment Hunter AI – Freiburg im Breisgau
+A smart automation tool that continuously searches for apartments in Freiburg im Breisgau and sends instant notifications via WhatsApp and Email whenever a suitable listing appears.
 
-A smart tool that automatically searches for apartments in Freiburg and sends you instant notifications via WhatsApp and Email whenever it finds a suitable listing.
+📛 Badges
+https://img.shields.io/badge/Python-3.10%2B-blue
+https://img.shields.io/badge/Status-Active-success
+https://img.shields.io/badge/License-MIT-green
+https://img.shields.io/badge/AI-Claude%20API-orange
+https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey
 
+📸 Screenshots
+(Replace these with real screenshots later)
+
+Dashboard Example
+https://via.placeholder.com/900x400?text=Dashboard+Preview
+
+WhatsApp Notification Example
+https://via.placeholder.com/600x200?text=WhatsApp+Notification
+
+Email Notification Example
+https://via.placeholder.com/600x200?text=Email+Notification
+
+🧩 System Architecture
+كتابة تعليمات برمجية
+ ┌──────────────────────────┐
+ │ Apartment Websites        │
+ │ (ImmoScout, WG-Gesucht…) │
+ └──────────────┬───────────┘
+                │ Scraper
+ ┌──────────────▼──────────────┐
+ │ Data Extraction & Cleaning   │
+ └──────────────┬──────────────┘
+                │
+ ┌──────────────▼──────────────┐
+ │ AI Scoring (Claude API)      │
+ │ - Relevance scoring           │
+ │ - Filtering                   │
+ └──────────────┬──────────────┘
+                │
+ ┌──────────────▼──────────────┐
+ │ Duplicate Checker (SQLite)   │
+ └──────────────┬──────────────┘
+                │
+ ┌──────────────▼──────────────┐
+ │ Notification Engine          │
+ │ - WhatsApp (CallMeBot)       │
+ │ - Email (Gmail App Password) │
+ └──────────────┬──────────────┘
+                │
+ ┌──────────────▼──────────────┐
+ │ Logging & Monitoring         │
+ └──────────────────────────────┘
 ✨ Features
-
 🔎 Automatically scans multiple apartment websites
 
-🤖 Uses AI filtering to detect the best listings
+🤖 AI-powered filtering to detect the best listings
 
-📲 Sends notifications via WhatsApp
+📲 WhatsApp notifications
 
-📧 Sends notifications via Email
+📧 Email notifications
 
 ⏱ Runs automatically every few minutes
 
 💾 Saves already-seen listings to avoid duplicates
 
+🧠 AI scoring for relevance
+
+🛡️ Configurable filters (size, rooms, rent, keywords)
+
 🌍 Supported Websites
 Website	Link
 🏢 ImmoScout24	https://immobilienscout24.de
-
 🏠 WG-Gesucht	https://wg-gesucht.de
-
 🏘 Immowelt	https://immowelt.de
-
 📦 eBay Kleinanzeigen	https://kleinanzeigen.de
-
 🏡 Wohnverdient	https://wohnverdient.de
 🚀 Setup Guide
 1️⃣ Install Python
-
-Make sure Python 3.10 or higher is installed.
-
+bash
 python --version
+Requires Python 3.10+.
+
 2️⃣ Install Dependencies
+bash
 pip install -r requirements.txt
 📧 Email Configuration (Gmail)
+Enable:
 
-Open your Google Account
+2-Step Verification
 
-Navigate to:
+App Passwords → Create password for Mail on Windows Computer
 
-Security → 2-Step Verification
+Add to config.json:
 
-Enable it if it's not already enabled.
-
-Then open:
-
-App Passwords → Create
-
-Choose:
-
-App: Mail
-Device: Windows Computer
-
-Google will generate a 16-character password.
-
-Add it to config.json:
-
+json
 "email": {
   "sender_email": "your_email@gmail.com",
   "sender_password": "xxxx xxxx xxxx xxxx",
   "recipient_email": "your_email@gmail.com"
 }
 📲 WhatsApp Notifications (CallMeBot)
+Send this message to +34 644 52 74 68:
 
-Open WhatsApp
-
-Send this message to:
-
-+34 644 52 74 68
-
-Message:
-
+كتابة تعليمات برمجية
 I allow callmebot to send me messages
+Add your API key to config.json:
 
-You will receive an API Key
-
-Add it to config.json:
-
+json
 "whatsapp": {
   "phone": "+4917612345678",
   "callmebot_apikey": "123456"
 }
 🤖 Claude AI Setup
-
-Create an account:
+Create an account at:
 
 https://console.anthropic.com
 
-Generate an API Key
+Add your API key:
 
-Add it to config.json:
-
+json
 "ai": {
   "anthropic_api_key": "sk-ant-..."
 }
 ⚙️ Search Configuration
+Example:
 
-Example settings in config.json
-
+json
 "search": {
   "city": "Freiburg im Breisgau",
   "min_size_m2": 40,
@@ -109,7 +134,7 @@ Example settings in config.json
   "max_rent_warm": 1400,
   "keywords_blacklist": ["tausch", "zwischenmiete"]
 }
-Setting Explanation
+Parameter Explanation
 Setting	Description
 min_size_m2	Minimum apartment size
 max_size_m2	Maximum apartment size
@@ -118,69 +143,77 @@ max_rooms	Maximum number of rooms
 max_rent_warm	Maximum warm rent
 keywords_blacklist	Ignore listings containing these keywords
 🧠 AI Filtering
-
-The system uses AI to rate each apartment listing.
-
 Score	Meaning
-8 – 10	Excellent match
-6 – 7	Good match
-Below 6	Ignored
+8–10	Excellent match
+6–7	Good match
+Ignored
+Default:
 
-Default configuration:
-
+كتابة تعليمات برمجية
 min_score = 6
 ▶️ Running the Program
 Test notifications
+bash
 python main.py --test
-
-This checks if Email and WhatsApp notifications work correctly.
-
 Run once
+bash
 python main.py
-Continuous monitoring (recommended)
+Continuous monitoring
+bash
 python main.py --loop
-
-The script will check for new apartments every 10 minutes.
-
 🤖 Run in Background
 Windows
+bash
 start /B python main.py --loop > output.log 2>&1
-Mac / Linux
+macOS / Linux
+bash
 nohup python main.py --loop &
 ⏰ Automatic Scheduling
-Linux / Mac (Cron)
-
-Run every 10 minutes:
-
+Linux / macOS (Cron)
+كتابة تعليمات برمجية
 */10 * * * * cd /path/to/apartment_hunter && python main.py >> cron.log 2>&1
 Windows
-
-Use Task Scheduler to run the script periodically.
+Use Task Scheduler.
 
 📊 Logs
+View logs:
 
-Monitor logs in real time:
-
+bash
 tail -f apartment_hunter.log
-
-Saved files:
-
+Files
 File	Description
 apartment_hunter.log	System logs
 apartments.db	Saved listings database
-💡 Tips
+🎥 Demo (Optional)
+(Replace with real GIF or video)
 
-Adjust scanning frequency using:
+https://via.placeholder.com/900x400?text=Demo+Video+Placeholder
 
-interval_minutes
+🧪 Example Output
+WhatsApp Message
+كتابة تعليمات برمجية
+🏠 New Apartment Found!
+📍 Location: Freiburg im Breisgau
+📏 Size: 52 m²
+💶 Rent: 1,200€ warm
+🔗 Link: https://example.com/listing
+Email Example
+كتابة تعليمات برمجية
+Subject: New Apartment Match – Freiburg
 
-inside config.json.
+A new apartment listing matches your criteria:
 
-The script avoids sending duplicate listings.
+Location: Freiburg im Breisgau
+Size: 48 m²
+Rent: 1,150€ warm
+Rooms: 2
 
+Link: https://example.com/listing
 🆘 Common Issues
 Problem	Solution
-Email not sending	Use a Gmail App Password, not your normal password
-WhatsApp notifications not working	Send the activation message to CallMeBot first
-API key error	Verify anthropic_api_key in config.json
+Email not sending	Use Gmail App Password
+WhatsApp not working	Send activation message to CallMeBot
+API key error	Check anthropic_api_key
 No listings found	Websites may temporarily block scraping
+📄 License
+This project is licensed under the MIT License.
