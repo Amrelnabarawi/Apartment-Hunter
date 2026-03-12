@@ -1,4 +1,4 @@
-name: 🏠 Apartment Hunter AI
+name: Apartment Hunter AI
 
 on:
   schedule:
@@ -11,27 +11,25 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - name: 📥 Checkout code
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: 🐍 Setup Python
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: 📦 Install libraries
+      - name: Install libraries
         run: pip install requests beautifulsoup4 anthropic lxml
 
-      - name: 🗄️ Restore database
+      - name: Restore database
         uses: actions/cache@v4
         with:
-          path: |
-            apartment_hunter/apartments.db
-            apartment_hunter/backups/
+          path: apartments.db
           key: apartments-db-${{ github.run_id }}
           restore-keys: apartments-db-
 
-      - name: 🚀 Run the tool
+      - name: Run the tool
         env:
           ANTHROPIC_API_KEY:  ${{ secrets.ANTHROPIC_API_KEY }}
           EMAIL_SENDER:       ${{ secrets.EMAIL_SENDER }}
@@ -39,23 +37,20 @@ jobs:
           EMAIL_RECIPIENT:    ${{ secrets.EMAIL_RECIPIENT }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: cd apartment_hunter && python main.py
+        run: python main.py
 
-      - name: 💾 Save database
+      - name: Save database
         uses: actions/cache/save@v4
         if: always()
         with:
-          path: |
-            apartment_hunter/apartments.db
-            apartment_hunter/backups/
+          path: apartments.db
           key: apartments-db-${{ github.run_id }}
 
-      - name: ☁️ Upload DB as Artifact (90 days backup)
+      - name: Upload DB backup
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: apartments-db-${{ github.run_number }}
-          path: apartment_hunter/apartments.db
+          path: apartments.db
           retention-days: 90
           if-no-files-found: ignore
-
