@@ -26,8 +26,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            apartments.db
-            backups/
+            apartment_hunter/apartments.db
+            apartment_hunter/backups/
           key: apartments-db-${{ github.run_id }}
           restore-keys: apartments-db-
 
@@ -39,15 +39,15 @@ jobs:
           EMAIL_RECIPIENT:    ${{ secrets.EMAIL_RECIPIENT }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python main.py
+        run: cd apartment_hunter && python main.py
 
       - name: 💾 Save database
         uses: actions/cache/save@v4
         if: always()
         with:
           path: |
-            apartments.db
-            backups/
+            apartment_hunter/apartments.db
+            apartment_hunter/backups/
           key: apartments-db-${{ github.run_id }}
 
       - name: ☁️ Upload DB as Artifact (90 days backup)
@@ -55,6 +55,6 @@ jobs:
         if: always()
         with:
           name: apartments-db-${{ github.run_number }}
-          path: apartments.db
+          path: apartment_hunter/apartments.db
           retention-days: 90
           if-no-files-found: ignore
