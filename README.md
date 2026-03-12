@@ -1,80 +1,85 @@
-# 🏠 Apartment Hunter AI – Freiburg im Breisgau
+🏠 Apartment Hunter AI – Freiburg im Breisgau
 
-أداة ذكية تبحث عن شقق تلقائياً في **فريبورغ** وتبعتلك إشعار على **واتساب + إيميل** لما تلاقي إعلان مناسب.
+A smart tool that automatically searches for apartments in Freiburg and sends you a notification via WhatsApp + Email whenever it finds a suitable listing.
 
----
+✅ Supported Websites
+Website	Link
+ImmoScout24	immobilienscout24.de
+WG-Gesucht	wg-gesucht.de
+Immowelt	immowelt.de
+eBay Kleinanzeigen	kleinanzeigen.de
+Wohnverdient	wohnverdient.de
+🚀 Setup – Step by Step
+Step 1 – Install Python
 
-## ✅ المواقع اللي بتراقبها
+Make sure Python 3.10+ is installed:
 
-| الموقع | الرابط |
-|--------|--------|
-| ImmoScout24 | immobilienscout24.de |
-| WG-Gesucht | wg-gesucht.de |
-| Immowelt | immowelt.de |
-| eBay Kleinanzeigen | kleinanzeigen.de |
-| Wohnverdient | wohnverdient.de |
-
----
-
-## 🚀 الإعداد خطوة بخطوة
-
-### الخطوة 1 – تثبيت Python
-تأكد إن Python 3.10+ مثبت:
-```bash
 python --version
-```
-
-### الخطوة 2 – تثبيت المكتبات
-```bash
+Step 2 – Install Dependencies
 pip install -r requirements.txt
-```
+Step 3 – Configure Email (Gmail)
 
-### الخطوة 3 – إعداد الإيميل (Gmail)
+Go to your Gmail account
 
-1. روح على حسابك في Gmail
-2. فتح: **Manage your Google Account → Security → 2-Step Verification** (لازم تكون مفعّلة)
-3. بعدها: **App passwords → Create** → اختار "Mail" و"Windows Computer"
-4. هيديك كلمة سر مكونة من 16 حرف → حطها في `config.json`
+Open:
+Manage your Google Account → Security → 2-Step Verification
+(This must be enabled)
 
-```json
+Then go to:
+App Passwords → Create
+
+Select:
+
+App: Mail
+
+Device: Windows Computer
+
+Google will generate a 16-character password
+
+Add it to config.json:
+
 "email": {
-    "sender_email": "emailak@gmail.com",
+    "sender_email": "your_email@gmail.com",
     "sender_password": "xxxx xxxx xxxx xxxx",
-    "recipient_email": "emailak@gmail.com"
+    "recipient_email": "your_email@gmail.com"
 }
-```
+Step 4 – Setup WhatsApp Notifications (CallMeBot – Free)
 
-### الخطوة 4 – إعداد WhatsApp (CallMeBot – مجاني)
+Open WhatsApp
 
-1. افتح واتساب وابعت رسالة للرقم: **+34 644 52 74 68**
-   - نص الرسالة: `I allow callmebot to send me messages`
-2. هيرد عليك بـ API Key
-3. حط رقمك والـ API Key في `config.json`:
+Send a message to:
 
-```json
++34 644 52 74 68
+
+Message text:
+
+I allow callmebot to send me messages
+
+You will receive an API Key
+
+Add your phone number and API key in config.json:
+
 "whatsapp": {
     "phone": "+4917612345678",
     "callmebot_apikey": "123456"
 }
-```
+Step 5 – Claude AI API Key
 
-### الخطوة 5 – Claude AI API Key
+Create an account at:
 
-1. سجّل على: https://console.anthropic.com
-2. اعمل API Key جديد
-3. حطه في `config.json`:
+https://console.anthropic.com
 
-```json
+Generate a new API Key
+
+Add it to config.json:
+
 "ai": {
     "anthropic_api_key": "sk-ant-..."
 }
-```
+⚙️ Search Settings (config.json)
 
----
+Example configuration:
 
-## ⚙️ إعدادات البحث في config.json
-
-```json
 "search": {
     "city": "Freiburg im Breisgau",
     "min_size_m2": 40,
@@ -84,70 +89,89 @@ pip install -r requirements.txt
     "max_rent_warm": 1400,
     "keywords_blacklist": ["tausch", "zwischenmiete"]
 }
-```
+Explanation
+Setting	Description
+min_size_m2	Minimum apartment size
+max_size_m2	Maximum apartment size
+min_rooms	Minimum number of rooms
+max_rooms	Maximum number of rooms
+max_rent_warm	Maximum total rent (warm rent)
+keywords_blacklist	Listings containing these keywords will be ignored
+AI Filtering
 
-**`min_score`**: الدرجة الأدنى من 10 حتى يبعت إشعار (الافتراضي: 6)
+min_score defines the minimum AI rating (0–10) required to trigger a notification.
 
----
+Example:
 
-## ▶️ التشغيل
+8–10 → Excellent match
 
-```bash
-# اختبار الإشعارات بس (تأكد إن كل حاجة شغالة)
+6–7 → Good match
+
+Below 6 → Ignored
+
+Default value:
+
+min_score = 6
+▶️ Running the Program
+Test notifications
 python main.py --test
 
-# تشغيل مرة وحدة
+This verifies that Email and WhatsApp notifications work correctly.
+
+Run once
 python main.py
-
-# تشغيل تلقائي كل 10 دقايق (الأهم!)
+Run continuously (recommended)
 python main.py --loop
-```
 
----
+This checks for new apartments every 10 minutes.
 
-## 🤖 تشغيل في الخلفية (على Windows)
-
-```bash
-# شغّل في خلفية Windows
+🤖 Run in the Background
+Windows
 start /B python main.py --loop > output.log 2>&1
-```
-
-### على Mac/Linux:
-```bash
+Mac / Linux
 nohup python main.py --loop &
-```
+Automated Scheduling
+Linux / Mac (Cron)
 
-### أو استخدم Task Scheduler (Windows) / Cron (Linux/Mac):
-```
-# Cron كل 10 دقايق:
+Run every 10 minutes:
+
 */10 * * * * cd /path/to/apartment_hunter && python main.py >> cron.log 2>&1
-```
+Windows
 
----
+Use Task Scheduler to run the script periodically.
 
-## 📊 مشاهدة السجل
+📊 View Logs
 
-```bash
-# شوف الـ log مباشرة
+To monitor logs in real time:
+
 tail -f apartment_hunter.log
-```
+💡 Tips
 
----
+AI Score
 
-## 💡 تلميحات
+8–10 → Excellent match
 
-- **الـ AI Score**: 8–10 = ممتاز، 6–7 = كويس، أقل = رفض
-- اللوغ بيتحفظ في `apartment_hunter.log`
-- الشقق اللي اتشافت بتتحفظ في `apartments.db`
-- غيّر `interval_minutes` في config لو عايز تفحص أكتر أو أقل تكراراً
+6–7 → Good match
 
----
+Below 6 → Rejected
 
-## 🆘 مشاكل شائعة
+Logs are stored in:
 
-| المشكلة | الحل |
-|---------|------|
-| إيميل مش بيتبعت | تأكد من App Password مش كلمة السر العادية |
-| واتساب مش شغال | ابعت رسالة التفعيل لـ CallMeBot أولاً |
-| API Key خطأ | تأكد من anthropic_api_key في config.json |
-| مفيش نتائج | المواقع ممكن تحجب الـ scraper، جرب بعد شوية |
+apartment_hunter.log
+
+Seen listings are stored in:
+
+apartments.db
+
+You can change the scanning frequency using:
+
+interval_minutes
+
+inside config.json.
+
+🆘 Common Issues
+Problem	Solution
+Email not sending	Make sure you're using a Gmail App Password, not your normal password
+WhatsApp notifications not working	Send the activation message to CallMeBot first
+API key error	Verify anthropic_api_key in config.json
+No listings found	Some websites may temporarily block scraping — try again later
