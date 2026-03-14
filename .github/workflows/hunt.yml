@@ -37,7 +37,7 @@ jobs:
           EMAIL_RECIPIENT:    ${{ secrets.EMAIL_RECIPIENT }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python main.py
+        run: python main.py --test
 
       - name: Save database
         uses: actions/cache/save@v4
