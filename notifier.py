@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 # ─────────────────────────────────────────────────
-# Outlook Email (smtp-mail.outlook.com)
+# Outlook Email (smtp.gmail.com)
 # ─────────────────────────────────────────────────
 def send_email(listing: dict, config: dict):
     cfg = config["notifications"]["email"]
