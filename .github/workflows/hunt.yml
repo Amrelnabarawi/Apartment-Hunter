@@ -27,7 +27,7 @@ jobs:
         with:
           path: apartments.db
           key: apartments-db-v2-${{ github.run_id }}
-          restore-keys: apartments-db-
+          restore-keys: apartments-db-v2-
 
       - name: Run the tool
         env:
