@@ -427,10 +427,12 @@ def scrape_wohnverdient(config: dict) -> List[Dict]:
 def run_all_scrapers(config: dict) -> List[Dict]:
     all_listings = []
     scrapers = [
-        ("ImmoScout24",        scrape_immoscout24),
         ("WG-Gesucht",         scrape_wggesucht),
-        ("Immowelt",           scrape_immowelt),
         ("eBay Kleinanzeigen", scrape_ebay_kleinanzeigen),
+        ("Immonet",            scrape_immonet),
+        ("Kalaydo",            scrape_kalaydo),
+        ("ImmoScout24",        scrape_immoscout24),
+        ("Immowelt",           scrape_immowelt),
         ("Wohnverdient",       scrape_wohnverdient),
     ]
     for name, fn in scrapers:
@@ -441,3 +443,104 @@ def run_all_scrapers(config: dict) -> List[Dict]:
         except Exception as e:
             logger.error(f"Scraper {name} failed: {e}")
     return all_listings
+
+
+# ─────────────────────────────────────────────────
+# 6. Immonet.de
+# ─────────────────────────────────────────────────
+def scrape_immonet(config: dict) -> List[Dict]:
+    listings = []
+    search = config["search"]
+    # Freiburg im Breisgau geoId = 110335
+    url = (
+        "https://www.immonet.de/immobiliensuche/sel.do"
+        "?objecttype=1&listsize=25&sortby=0"
+        "&city=110335"
+        f"&area={search['min_size_m2']}-{search['max_size_m2']}"
+        f"&price={search.get('min_rent_cold',500)}-{search['max_rent_warm']}"
+        "&room=2-2&radius=20"
+        "&action=listing"
+    )
+
+    soup = get_page(url, delay=config["scraper"]["request_delay_seconds"])
+    if not soup:
+        return listings
+
+    cards = soup.select(".item-list-element, [id^='selObj'], .list-item")
+    for card in cards[:25]:
+        try:
+            title_el = card.select_one("h2, h3, .item-title, [class*='title']")
+            price_el = card.select_one("[class*='price'], .item-price")
+            link_el  = card.select_one("a[href]")
+            if not link_el:
+                continue
+            href = link_el.get("href", "")
+            if href.startswith("/"):
+                href = "https://www.immonet.de" + href
+            listing_id = re.search(r"/(\d+)", href)
+            listing_id = listing_id.group(1) if listing_id else href[-15:]
+            text = card.get_text(separator=" ", strip=True)
+            listings.append({
+                "id": f"immonet_{listing_id}",
+                "title": title_el.get_text(strip=True) if title_el else "Wohnung Freiburg",
+                "price": parse_price(price_el.get_text() if price_el else text),
+                "size":  parse_size(text),
+                "rooms": 2.0,
+                "address": "Freiburg im Breisgau",
+                "url": href,
+                "source": "Immonet",
+                "description": text[:500],
+            })
+        except Exception as e:
+            logger.error(f"Immonet card error: {e}")
+
+    logger.info(f"Immonet: found {len(listings)} listings")
+    return listings
+
+
+# ─────────────────────────────────────────────────
+# 7. Kalaydo.de
+# ─────────────────────────────────────────────────
+def scrape_kalaydo(config: dict) -> List[Dict]:
+    listings = []
+    search = config["search"]
+    url = (
+        "https://www.kalaydo.de/immobilien/wohnung-mieten/freiburg-im-breisgau/"
+        f"?priceMax={search['max_rent_warm']}"
+        f"&areaMin={search['min_size_m2']}&areaMax={search['max_size_m2']}"
+        "&rooms=2"
+    )
+
+    soup = get_page(url, delay=config["scraper"]["request_delay_seconds"])
+    if not soup:
+        return listings
+
+    cards = soup.select(".result-item, .listing-item, article, [class*='result']")
+    for card in cards[:25]:
+        try:
+            title_el = card.select_one("h2, h3, [class*='title']")
+            price_el = card.select_one("[class*='price']")
+            link_el  = card.select_one("a[href]")
+            if not link_el:
+                continue
+            href = link_el.get("href", "")
+            if href.startswith("/"):
+                href = "https://www.kalaydo.de" + href
+            listing_id = re.sub(r"[^a-zA-Z0-9]", "", href)[-15:]
+            text = card.get_text(separator=" ", strip=True)
+            listings.append({
+                "id": f"kalaydo_{listing_id}",
+                "title": title_el.get_text(strip=True) if title_el else "Wohnung Freiburg",
+                "price": parse_price(price_el.get_text() if price_el else text),
+                "size":  parse_size(text),
+                "rooms": 2.0,
+                "address": "Freiburg im Breisgau",
+                "url": href,
+                "source": "Kalaydo",
+                "description": text[:500],
+            })
+        except Exception as e:
+            logger.error(f"Kalaydo card error: {e}")
+
+    logger.info(f"Kalaydo: found {len(listings)} listings")
+    return listings
