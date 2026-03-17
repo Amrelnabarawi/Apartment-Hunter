@@ -20,15 +20,10 @@ jobs:
           python-version: '3.11'
 
       - name: Install libraries
-        run: pip install requests beautifulsoup4 anthropic lxml
+        run: pip install requests beautifulsoup4 lxml
 
       - name: Clear old database
         run: rm -f apartments.db
-        uses: actions/cache@v4
-        with:
-          path: apartments.db
-          key: apartments-db-v2-${{ github.run_id }}
-          restore-keys: apartments-db-v2-
 
       - name: Run the tool
         env:
@@ -39,13 +34,6 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python main.py
-
-      - name: Save database
-        uses: actions/cache/save@v4
-        if: always()
-        with:
-          path: apartments.db
-          key: apartments-db-v2-${{ github.run_id }}
 
       - name: Upload DB backup
         uses: actions/upload-artifact@v4
