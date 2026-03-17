@@ -26,7 +26,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: apartments.db
-          key: apartments-db-${{ github.run_id }}
+          key: apartments-db-v2-${{ github.run_id }}
           restore-keys: apartments-db-
 
       - name: Run the tool
@@ -44,7 +44,7 @@ jobs:
         if: always()
         with:
           path: apartments.db
-          key: apartments-db-${{ github.run_id }}
+          key: apartments-db-v2-${{ github.run_id }}
 
       - name: Upload DB backup
         uses: actions/upload-artifact@v4
