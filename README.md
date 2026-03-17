@@ -1,30 +1,34 @@
 # 🏠 Apartment Hunter AI — Freiburg im Breisgau
 
-An automated apartment hunting tool that monitors 5 German rental websites 24/7, scores listings using AI, and sends instant notifications via Email and Telegram — even when your laptop is completely off.
+An automated apartment hunting tool that monitors 7 German rental websites every hour, filters listings by location and criteria, and sends instant notifications via Email and Telegram — completely free, no AI API needed, runs in the cloud 24/7 even when your laptop is off.
 
 ---
 
 ## ✨ Features
 
-- 🔍 **Monitors 5 websites** every hour automatically
-- 🤖 **AI scoring** — each listing is rated 1–10 by Claude AI
+- 🔍 **Monitors 7 websites** every hour automatically
+- 📍 **Strict location filter** — only Freiburg im Breisgau area (20km radius)
+- 🧠 **Smart rule-based scoring** — rates each listing 1–10 for free (no API cost)
 - 📧 **Email + Telegram** notifications for good listings (score 6+)
+- 🔄 **No duplicate alerts** — only notifies when a truly NEW listing appears
 - 📊 **Daily summary email** every morning at 8:00 AM
-- 🔒 **3-level backup system** — local, GitHub cache, and 90-day artifacts
-- 💌 **One-click application** — sends your German cover letter directly to landlords
-- ☁️ **Runs in the cloud** via GitHub Actions — no laptop needed
+- ☁️ **Runs in the cloud** via GitHub Actions — laptop can be completely off
+- 💌 **One-click application** — sends German cover letter to landlords
+- 💰 **100% free** — no credit card, no API costs
 
 ---
 
 ## 🌐 Websites Monitored
 
-| Website | Type |
-|---------|------|
-| ImmoScout24 | Germany's largest rental platform |
-| Immowelt | Major rental platform |
-| WG-Gesucht | Apartments and rooms |
-| eBay Kleinanzeigen | Private listings |
-| Wohnverdient.de | Additional listings |
+| Website | Status |
+|---------|--------|
+| WG-Gesucht | ✅ Working |
+| eBay Kleinanzeigen | ✅ Working |
+| Immonet | ✅ Working |
+| Kalaydo | ✅ Working |
+| ImmoScout24 | ⚠️ Sometimes blocked |
+| Immowelt | ⚠️ Sometimes blocked |
+| Wohnverdient | ⚠️ Sometimes blocked |
 
 ---
 
@@ -32,7 +36,7 @@ An automated apartment hunting tool that monitors 5 German rental websites 24/7,
 
 | Parameter | Value |
 |-----------|-------|
-| Location | Freiburg im Breisgau + 15km radius |
+| Location | Freiburg im Breisgau + 20km radius |
 | Size | 40 – 70 m² |
 | Rooms | 2 Zimmer |
 | Cold rent | 500 – 700€ |
@@ -41,19 +45,44 @@ An automated apartment hunting tool that monitors 5 German rental websites 24/7,
 
 ---
 
+## 🧠 How the Smart Filter Works
+
+No AI API needed — the filter scores each listing based on rules:
+
+| Criteria | Points |
+|----------|--------|
+| Price ≤ 700€ | +2 |
+| Price ≤ 850€ | +1 |
+| Price > 1000€ | -2 |
+| Size 40–70m² | +1 |
+| Size > 70m² (spacious) | +2 |
+| Has balcony | +1 |
+| Has elevator | +1 |
+| City center (Altstadt/Innenstadt) | +1 |
+| 3+ positive features (EBK, renoviert...) | +1 |
+| Negative features (Souterrain, befristet...) | -1 |
+
+**Score 6+ → Email + Telegram notification sent immediately ✅**
+
+---
+
 ## ⚙️ How It Works
 
 ```
-Every hour → GitHub Actions runs the tool
+Every hour → GitHub Actions runs the tool for free
                     ↓
-        Scrapes 5 websites for new listings
+        Scrapes 7 websites for new listings
                     ↓
-        AI filters and scores each listing
+        Rejects listings outside Freiburg area
+                    ↓
+        Checks if listing was seen before
+                    ↓
+        New listing? → Scores it (1-10)
                     ↓
         Score 6+ ? → Email + Telegram sent ✅
         Score < 6 ? → Skipped ❌
                     ↓
-        Database saved + backup uploaded
+        Database saved for next run
 ```
 
 ---
@@ -61,30 +90,31 @@ Every hour → GitHub Actions runs the tool
 ## 🚀 Setup
 
 ### Requirements
-- GitHub account (free)
-- Anthropic API key — console.anthropic.com
-- Gmail account + App Password
-- Telegram bot token + chat ID
+- GitHub account (free) — github.com
+- Gmail account + App Password (free)
+- Telegram bot token + chat ID (free)
 
 ### GitHub Secrets Required
 
-| Secret | Description |
-|--------|-------------|
-| `ANTHROPIC_API_KEY` | Claude AI API key |
-| `EMAIL_SENDER` | Your Gmail address |
-| `EMAIL_PASSWORD` | Gmail App Password (16 characters) |
-| `EMAIL_RECIPIENT` | Email to receive alerts |
-| `TELEGRAM_BOT_TOKEN` | Token from @BotFather |
-| `TELEGRAM_CHAT_ID` | Your Telegram user ID |
-
-### Getting Your Telegram Credentials
-1. Open Telegram → search **@BotFather** → send `/newbot`
-2. Follow the steps → copy the **Bot Token**
-3. Search **@userinfobot** → send any message → copy your **Chat ID**
+| Secret | Description | How to get |
+|--------|-------------|------------|
+| `EMAIL_SENDER` | Your Gmail address | Your Gmail |
+| `EMAIL_PASSWORD` | Gmail App Password (16 chars) | Gmail → Security → App Passwords |
+| `EMAIL_RECIPIENT` | Email to receive alerts | Any email you check |
+| `TELEGRAM_BOT_TOKEN` | Telegram bot token | @BotFather on Telegram → /newbot |
+| `TELEGRAM_CHAT_ID` | Your Telegram user ID | @userinfobot on Telegram |
+| `ANTHROPIC_API_KEY` | Optional — not used for filtering | Not needed anymore |
 
 ### Getting Gmail App Password
-1. Go to myaccount.google.com → Security → 2-Step Verification → enable it
-2. Go to App Passwords → create one → copy the 16 characters
+1. Go to **myaccount.google.com → Security → 2-Step Verification** → enable it
+2. Go to **App Passwords** → create one → copy the 16 characters
+3. Use this as `EMAIL_PASSWORD` (NOT your normal Gmail password)
+
+### Getting Telegram Credentials
+1. Open Telegram → search **@BotFather** → send `/newbot`
+2. Follow the steps → copy the **Bot Token**
+3. Search **@userinfobot** → send any message → copy your **ID number**
+4. Open your new bot and press **Start** (important!)
 
 ---
 
@@ -92,20 +122,45 @@ Every hour → GitHub Actions runs the tool
 
 ```
 apartment_hunter/
-├── main.py              # Entry point
-├── scrapers.py          # Website scrapers (5 sites)
-├── ai_filter.py         # Claude AI scoring engine
-├── notifier.py          # Email + Telegram notifications
-├── backup.py            # 3-level backup system
-├── database.py          # SQLite database handler
+├── main.py              # Entry point — runs once or in loop
+├── scrapers.py          # Website scrapers (7 sites)
+├── ai_filter.py         # Smart rule-based filter (free, no API)
+├── notifier.py          # Email (Gmail) + Telegram notifications
+├── backup.py            # Daily backup system
+├── database.py          # SQLite — tracks seen listings
 ├── apply.py             # Cover letter sender
-├── config.json          # All settings
+├── config.json          # All search settings
 ├── SETUP_AND_RUN.bat    # Windows: install & run locally
 ├── APPLY_NOW.bat        # Windows: send application to landlord
 ├── BACKUP_NOW.bat       # Windows: manual backup
 └── .github/
     └── workflows/
-        └── hunt.yml     # GitHub Actions automation
+        └── hunt.yml     # GitHub Actions — runs every hour
+```
+
+---
+
+## ⚙️ GitHub Actions Workflow (hunt.yml)
+
+```yaml
+name: Apartment Hunter AI
+
+on:
+  schedule:
+    - cron: '0 * * * *'   # Every hour
+  workflow_dispatch:        # Manual trigger
+
+jobs:
+  hunt:
+    runs-on: ubuntu-latest
+    steps:
+      - Checkout code
+      - Setup Python 3.11
+      - Install libraries (requests, beautifulsoup4, lxml)
+      - Restore database from cache
+      - Run the tool
+      - Save database to cache
+      - Upload DB as 90-day backup artifact
 ```
 
 ---
@@ -116,26 +171,26 @@ apartment_hunter/
 ```
 🏠 New Apartment in Freiburg!
 
-⭐⭐⭐⭐⭐⭐⭐⭐ AI Score: 8/10
-📌 Schöne 2-Zimmer Wohnung in Freiburg-Altstadt
-💰 650€/Monat
-📐 55m²  🚪 2 Zimmer
-📍 Freiburg im Breisgau
-🤖 Great location near city center, balcony included
+⭐⭐⭐⭐⭐⭐⭐ AI Score: 7/10
+📌 Schöne 2-Zimmer Wohnung mit Balkon
+💰 620€/Monat
+📐 52m²  🚪 2 Zimmer
+📍 Freiburg im Breisgau, Wiehre
+🤖 620€ • 52m² • Balcony ✅ • Great price
 🔗 View Listing
 ```
 
 ### Email
-A full HTML email with all listing details and a direct link to the listing.
+Full HTML email with all listing details and a direct link.
 
 ### Daily Summary (8:00 AM)
-A daily report with total listings found, top-scored apartments, and statistics by website.
+Daily report with all listings found, top scores, and stats by website.
 
 ---
 
 ## 💌 Applying for an Apartment
 
-When you find a listing you like:
+When you like a listing:
 1. Double-click **APPLY_NOW.bat** on your Windows laptop
 2. Select the listing from the list
 3. The tool sends your German cover letter directly to the landlord
@@ -146,9 +201,21 @@ When you find a listing you like:
 
 | Level | Method | Retention |
 |-------|--------|-----------|
-| 1 | Local backups/ folder | Last 7 days |
-| 2 | GitHub Actions cache | Per run |
-| 3 | GitHub Artifact | 90 days |
+| 1 | GitHub Actions cache | Between runs |
+| 2 | GitHub Artifact | 90 days |
+| 3 | Local backups/ folder | Last 7 days (when run locally) |
+
+---
+
+## 🛠️ Troubleshooting
+
+| Problem | Solution |
+|---------|----------|
+| No notifications | Check GitHub Actions logs → Run the tool section |
+| Wrong city listings | Location filter is strict — only Freiburg 20km |
+| Duplicate notifications | Database cache is working — should not happen |
+| Email not arriving | Check Gmail Spam folder |
+| Workflow failing | Check GitHub Secrets are all set correctly |
 
 ---
 
